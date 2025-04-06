@@ -1,0 +1,13 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5439/progress
+    username: testuser
+    password: Pass8ord
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create-drop  # или create, create-drop, none в зависимости от ваших нужд
+    show-sql: true  # чтобы видеть SQL-запросы в консоли
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
