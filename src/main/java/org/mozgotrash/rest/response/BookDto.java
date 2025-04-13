@@ -1,7 +1,5 @@
-package org.mozgotrash.rest.request;
+package org.mozgotrash.rest.response;
 
-import jakarta.persistence.Lob;
-import jakarta.persistence.ManyToOne;
 import lombok.Builder;
 import lombok.Data;
 import org.mozgotrash.model.Book;
@@ -22,7 +20,9 @@ public class BookDto {
 
     String base64Image;
 
-    Goal goal;
+    Double percentageOfGoal;
+
+    Book.Status status;
 
     public static BookDto fromEntity(Book book) {
         return BookDto.builder()
@@ -31,6 +31,13 @@ public class BookDto {
                 .title(book.getTitle())
                 .pageCount(book.getPageCount())
                 .base64Image(Base64.getEncoder().encodeToString(book.getImageData()))
+                .percentageOfGoal(getPercentageOfGoal(book))
+                .status(book.getStatus())
                 .build();
+    }
+
+    private static double getPercentageOfGoal(Book book) {
+        int goalPageSum = book.getGoal().getBooks().stream().mapToInt(Book::getPageCount).sum();
+        return ((double) book.getPageCount() / goalPageSum ) * 100;
     }
 }

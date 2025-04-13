@@ -36,7 +36,7 @@ public class ProgressCalculator {
         bookAndLogs.forEach((book, logs) -> progressList.add(
                 getProgressForBook(
                         logs,
-                        book.getPageCount()
+                        book
                 )
         ));
 
@@ -44,9 +44,14 @@ public class ProgressCalculator {
     }
 
 
-    public double getProgressForBook(List<Log> logs, Integer bookPageCount) {
-        int readPages = logs.stream().mapToInt(Log::getPageCount).sum();
-        return  ((double) readPages / bookPageCount) * 100;
+    public double getProgressForBook(List<Log> logs, Book book) {
+        int readPages;
+        if(book.getStatus().equals(Book.Status.COMPLETED)) {
+            readPages = book.getPageCount();
+        } else {
+            readPages = logs.stream().mapToInt(Log::getPageCount).sum();
+        }
+        return  ((double) readPages / book.getPageCount()) * 100;
     }
 
 }

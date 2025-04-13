@@ -2,8 +2,15 @@ package org.mozgotrash.rest.controller;
 
 import jakarta.websocket.server.PathParam;
 import org.mozgotrash.model.Book;
+import org.mozgotrash.model.Goal;
+import org.mozgotrash.model.Log;
 import org.mozgotrash.repository.BookRepository;
+import org.mozgotrash.repository.GoalRepository;
+import org.mozgotrash.repository.LogRepository;
 import org.mozgotrash.rest.request.AddBookRequest;
+import org.mozgotrash.rest.response.GoalDto;
+import org.mozgotrash.rest.response.ProgressDto;
+import org.mozgotrash.service.ProgressCalculator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,19 +20,46 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.yaml.snakeyaml.util.Tuple;
 
 import java.util.Base64;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/progress")
 public class ProgressController {
 
     @Autowired
+    private GoalRepository goalRepository;
+
+    @Autowired
     private BookRepository bookRepository;
 
+    @Autowired
+    private LogRepository logRepository;
+
+    @Autowired
+    private ProgressCalculator progressCalculator;
+
+    //TODO вызыв вставленой в sql init цели
     @GetMapping("/current")
-    ResponseEntity<Double> getProgress() {
-        return ResponseEntity.ok().body(37.4);
+    ResponseEntity<ProgressDto> getProgress() {
+        Goal goal = goalRepository.findById(1l).get();
+        List<Book> allBooks = bookRepository.findAll();
+        Map<Book, List<Log>> bookWithLogs = allBooks.stream()
+                .map(book -> new Tuple<>(book, logRepository.findAllByBookId(book.getId())))
+                .collect(Collectors.toMap(
+                        tuple -> tuple._1(),
+                        tuple -> tuple._2()));
+        double progressPercentage = progressCalculator.getProgressForGoal(bookWithLogs);
+        return ResponseEntity.ok(ProgressDto
+                .builder()
+                .goal(GoalDto.fromEntity(goal))
+                .progressPercentage(progressPercentage)
+                .build());
     }
 
     @PostMapping("/book")

@@ -1,8 +1,7 @@
 package org.mozgotrash.rest.controller;
 
-import org.mozgotrash.model.Book;
 import org.mozgotrash.repository.BookRepository;
-import org.mozgotrash.rest.request.BookDto;
+import org.mozgotrash.rest.response.BookDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

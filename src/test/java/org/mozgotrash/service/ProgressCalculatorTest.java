@@ -27,7 +27,11 @@ public class ProgressCalculatorTest {
                 Log.builder().pageCount(3).build(),
                 Log.builder().pageCount(2).build(),
                 Log.builder().pageCount(5).build());
-        var res = progressCalculator.getProgressForBook(logs, 500);
+        Book book = Book.builder()
+                .status(Book.Status.IN_PROGRESS)
+                .pageCount(500)
+                .build();
+        var res = progressCalculator.getProgressForBook(logs, book);
         Assertions.assertEquals(2d, res);
     }
 
@@ -43,11 +47,11 @@ public class ProgressCalculatorTest {
 
         Map<Book, List<Log>> logsByBook = Map.of(
                 //book1 100% прочитано
-                Book.builder().id(1l).pageCount(200).build(), logsByBook1,
+                Book.builder().id(1l).status(Book.Status.IN_PROGRESS).pageCount(200).build(), logsByBook1,
                 //book2 50% прочитано
-                Book.builder().id(2l).pageCount(100).build(), logsByBook2,
+                Book.builder().id(2l).status(Book.Status.HOLD).pageCount(100).build(), logsByBook2,
                 //book3 0% прочитано
-                Book.builder().id(3l).pageCount(100).build(), List.of()
+                Book.builder().id(3l).status(Book.Status.HOLD).pageCount(100).build(), List.of()
         );
 
         double res = progressCalculator.getProgressForGoal(logsByBook);

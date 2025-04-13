@@ -1,5 +1,6 @@
 package org.mozgotrash.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -28,9 +29,11 @@ public class Goal {
 
     String title;
 
-    @OneToMany(fetch = FetchType.EAGER)
-    @JoinColumn(name = "goal_id")
+    @JsonManagedReference
+    @OneToMany(mappedBy = "goal", orphanRemoval = true)
     List<Book> books;
 
     LocalDate deadline;
+
+
 }
