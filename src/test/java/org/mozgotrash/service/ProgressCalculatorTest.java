@@ -31,7 +31,7 @@ public class ProgressCalculatorTest {
                 .status(Book.Status.IN_PROGRESS)
                 .pageCount(500)
                 .build();
-        var res = progressCalculator.getProgressForBook(logs, book);
+        var res = progressCalculator.getProgressForBook(book);
         Assertions.assertEquals(2d, res);
     }
 
@@ -54,7 +54,7 @@ public class ProgressCalculatorTest {
                 Book.builder().id(3l).status(Book.Status.HOLD).pageCount(100).build(), List.of()
         );
 
-        double res = progressCalculator.getProgressForGoal(logsByBook);
+        double res = progressCalculator.getProgressForGoal(null);
         Assertions.assertEquals(50d, res);
     }
 }

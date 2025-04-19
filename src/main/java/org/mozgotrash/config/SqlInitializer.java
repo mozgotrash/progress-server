@@ -39,13 +39,13 @@ public class SqlInitializer implements ApplicationListener<ContextRefreshedEvent
                 .title("Java senior")
                 .deadline(LocalDate.parse("2027-10-23"))
                 .build());
-        bookRepository.save(Book.builder()
+        Book bookWithLogs2 = bookRepository.save(Book.builder()
                 .pageCount(526)
                 .imageData(getImageBytes("spring-in-actions.png"))
                 .title("Spring в действии, 6-е издание")
                 .author("Крейг Уоллс")
                 .goal(saved)
-                .status(Book.Status.COMPLETED)
+                .status(Book.Status.IN_PROGRESS)
                 .build());
         Book bookWithLogs = bookRepository.save(Book.builder()
                 .pageCount(630)
@@ -67,6 +67,12 @@ public class SqlInitializer implements ApplicationListener<ContextRefreshedEvent
         logRepository.save(Log.builder()
                 .book(bookWithLogs)
                 .pageCount(180)
+                .logDate(OffsetDateTime.now())
+                .build());
+
+        logRepository.save(Log.builder()
+                .book(bookWithLogs2)
+                .pageCount(526)
                 .logDate(OffsetDateTime.now())
                 .build());
     }

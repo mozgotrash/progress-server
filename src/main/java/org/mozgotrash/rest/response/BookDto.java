@@ -22,6 +22,8 @@ public class BookDto {
 
     Double percentageOfGoal;
 
+    Double percentRead;
+
     Book.Status status;
 
     public static BookDto fromEntity(Book book) {

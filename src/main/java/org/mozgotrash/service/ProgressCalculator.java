@@ -7,6 +7,7 @@ import org.mozgotrash.repository.BookRepository;
 import org.mozgotrash.repository.LogRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -31,27 +32,30 @@ public class ProgressCalculator {
      * return процент достижения цели
      *
      */
-    public double getProgressForGoal(Map<Book, List<Log>> bookAndLogs) {
-        List<Double> progressList = new ArrayList<>();
-        bookAndLogs.forEach((book, logs) -> progressList.add(
-                getProgressForBook(
-                        logs,
-                        book
-                )
-        ));
+    //TODO remove Transactional
+    //проблем с LOB
+    @Transactional
+    public double getProgressForGoal(Goal goal) {
+        Double pagesInGoal = goal.getBooks().stream()
+                .mapToDouble(Book::getPageCount)
+                .sum();
+        Double pagesRead = goal.getBooks().stream()
+                .map(b -> logRepository.findAllByBookId(b.getId()).stream().mapToInt(Log::getPageCount).sum())
+                .mapToDouble(p -> p)
+                .sum();
 
-        return progressList.stream().mapToDouble(Double::doubleValue).sum() / progressList.size();
+        return (pagesRead / pagesInGoal) * 100;
     }
 
 
-    public double getProgressForBook(List<Log> logs, Book book) {
+    @Transactional
+    public double getProgressForBook(Book book) {
         int readPages;
         if(book.getStatus().equals(Book.Status.COMPLETED)) {
             readPages = book.getPageCount();
         } else {
-            readPages = logs.stream().mapToInt(Log::getPageCount).sum();
+            readPages = logRepository.findAllByBookId(book.getId()).stream().mapToInt(Log::getPageCount).sum();
         }
         return  ((double) readPages / book.getPageCount()) * 100;
     }
-
 }

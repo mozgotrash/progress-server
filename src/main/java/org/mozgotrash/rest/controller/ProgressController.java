@@ -48,16 +48,19 @@ public class ProgressController {
     @GetMapping("/current")
     ResponseEntity<ProgressDto> getProgress() {
         Goal goal = goalRepository.findById(1l).get();
-        List<Book> allBooks = bookRepository.findAll();
-        Map<Book, List<Log>> bookWithLogs = allBooks.stream()
-                .map(book -> new Tuple<>(book, logRepository.findAllByBookId(book.getId())))
-                .collect(Collectors.toMap(
-                        tuple -> tuple._1(),
-                        tuple -> tuple._2()));
-        double progressPercentage = progressCalculator.getProgressForGoal(bookWithLogs);
+        double progressPercentage = progressCalculator.getProgressForGoal(goal);
+        GoalDto goalDto = GoalDto.fromEntity(goal);
+        goalDto.getBooks()
+                .forEach(bookDto -> {
+                    Double percentRead = (logRepository.findAllByBookId(bookDto.getId())
+                            .stream()
+                            .mapToDouble(Log::getPageCount).sum() / bookDto.getPageCount())
+                            * 100;
+                    bookDto.setPercentRead(percentRead);
+                });
         return ResponseEntity.ok(ProgressDto
                 .builder()
-                .goal(GoalDto.fromEntity(goal))
+                .goal(goalDto)
                 .progressPercentage(progressPercentage)
                 .build());
     }
