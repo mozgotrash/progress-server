@@ -1,6 +1,7 @@
 package org.mozgotrash.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -34,6 +35,7 @@ public class Book {
     Integer pageCount;
 
     @Lob
+    @Column(columnDefinition = "BLOB")
     byte[] imageData;
 
     @JsonBackReference

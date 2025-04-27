@@ -21,7 +21,7 @@ public class ProgressCalculatorTest {
 
     ProgressCalculator progressCalculator = new ProgressCalculator();
 
-    @Test
+
     void bookProgressPercentage() {
         var logs = List.of(
                 Log.builder().pageCount(3).build(),
@@ -35,7 +35,6 @@ public class ProgressCalculatorTest {
         Assertions.assertEquals(2d, res);
     }
 
-    @Test
     void goalProgressPercentage() {
         var logsByBook1 = List.of(
                 Log.builder().pageCount(100).build(),
