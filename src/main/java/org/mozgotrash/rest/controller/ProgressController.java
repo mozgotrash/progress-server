@@ -11,6 +11,7 @@ import org.mozgotrash.rest.request.AddBookRequest;
 import org.mozgotrash.rest.response.GoalDto;
 import org.mozgotrash.rest.response.ProgressDto;
 import org.mozgotrash.service.ProgressCalculator;
+import org.mozgotrash.service.ProgressService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.yaml.snakeyaml.util.Tuple;
 
+import java.math.BigDecimal;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
@@ -33,23 +35,24 @@ import java.util.stream.Collectors;
 public class ProgressController {
 
     @Autowired
-    private GoalRepository goalRepository;
+    private ProgressService progressService;
 
     @Autowired
     private BookRepository bookRepository;
 
     @Autowired
-    private LogRepository logRepository;
+    private GoalRepository goalRepository;
 
     @Autowired
-    private ProgressCalculator progressCalculator;
+    private LogRepository logRepository;
+
 
     //TODO вызыв вставленой в sql init цели
     @GetMapping("/current")
     ResponseEntity<ProgressDto> getProgress() {
-        Goal goal = goalRepository.findById(1l).get();
-        double progressPercentage = progressCalculator.getProgressForGoal(goal);
-        GoalDto goalDto = GoalDto.fromEntity(goal);
+        List<Goal> userGoals = goalRepository.findByUserId(1L);
+        BigDecimal progressPercentage = progressService.getProgressPercentage(userGoals.get(0));
+        GoalDto goalDto = GoalDto.fromEntity(userGoals.get(0));
         goalDto.getBooks()
                 .forEach(bookDto -> {
                     Double percentRead = (logRepository.findAllByBookId(bookDto.getId())

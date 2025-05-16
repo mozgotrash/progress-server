@@ -5,9 +5,11 @@ import org.apache.tomcat.util.codec.binary.Base64;
 import org.mozgotrash.model.Book;
 import org.mozgotrash.model.Goal;
 import org.mozgotrash.model.Log;
+import org.mozgotrash.model.User;
 import org.mozgotrash.repository.BookRepository;
 import org.mozgotrash.repository.GoalRepository;
 import org.mozgotrash.repository.LogRepository;
+import org.mozgotrash.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -32,12 +34,17 @@ public class SqlInitializer implements ApplicationListener<ContextRefreshedEvent
     @Autowired
     private LogRepository logRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
     @SneakyThrows
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
+        User user = userRepository.save(User.builder().tgId(637781634L).tgUsername("Mozgotrash").build());
         Goal saved = goalRepository.save(Goal.builder()
                 .title("Java senior")
                 .deadline(LocalDate.parse("2027-10-23"))
+                .user(user)
                 .build());
         Book bookWithLogs2 = bookRepository.save(Book.builder()
                 .pageCount(526)

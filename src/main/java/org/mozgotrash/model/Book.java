@@ -12,6 +12,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -35,12 +36,12 @@ public class Book {
     Integer pageCount;
 
     @Lob
-    @Column(columnDefinition = "BLOB")
+//    @Column(columnDefinition = "BLOB") //для запуска с h2
     byte[] imageData;
 
     @JsonBackReference
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "goal_id")
+    @JoinColumn(name = "goal_id", nullable = false)
     Goal goal;
 
     @Enumerated(value = EnumType.STRING)

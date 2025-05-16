@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.MathContext;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -24,18 +26,9 @@ public class ProgressCalculator {
     @Autowired
     private LogRepository logRepository;
 
-    /**
-     * Расчет прогресса завершения цели по формуле
-     * res = (% прогресса книга1 + % прогресса книга2 + % прогресса книга3) / 3
-     * res = (100 + 50 + 0) / 3 = 50%
-     * @param goal
-     * return процент достижения цели
-     *
-     */
-    //TODO remove Transactional
-    //проблем с LOB
+
     @Transactional
-    public double getProgressForGoal(Goal goal) {
+    public BigDecimal getProgressForGoal(Goal goal) {
         Double pagesInGoal = goal.getBooks().stream()
                 .mapToDouble(Book::getPageCount)
                 .sum();
@@ -44,7 +37,7 @@ public class ProgressCalculator {
                 .mapToDouble(p -> p)
                 .sum();
 
-        return (pagesRead / pagesInGoal) * 100;
+        return BigDecimal.valueOf((pagesRead / pagesInGoal) * 100).setScale(3, RoundingMode.FLOOR);
     }
 
 
