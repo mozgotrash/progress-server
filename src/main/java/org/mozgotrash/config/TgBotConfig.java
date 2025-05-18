@@ -1,6 +1,6 @@
 package org.mozgotrash.config;
 
-import org.mozgotrash.service.TgBot;
+import org.mozgotrash.tg.TgBot;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.telegram.telegrambots.meta.TelegramBotsApi;

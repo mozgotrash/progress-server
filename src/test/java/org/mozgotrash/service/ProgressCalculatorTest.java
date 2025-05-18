@@ -11,6 +11,7 @@ import org.mozgotrash.model.Goal;
 import org.mozgotrash.model.Log;
 import org.mozgotrash.repository.LogRepository;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -53,7 +54,7 @@ public class ProgressCalculatorTest {
                 Book.builder().id(3l).status(Book.Status.HOLD).pageCount(100).build(), List.of()
         );
 
-        double res = progressCalculator.getProgressForGoal(null);
+        BigDecimal res = progressCalculator.getProgressForGoal(null);
         Assertions.assertEquals(50d, res);
     }
 }

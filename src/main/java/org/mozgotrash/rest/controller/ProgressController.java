@@ -1,6 +1,5 @@
 package org.mozgotrash.rest.controller;
 
-import jakarta.websocket.server.PathParam;
 import org.mozgotrash.model.Book;
 import org.mozgotrash.model.Goal;
 import org.mozgotrash.model.Log;
@@ -10,32 +9,25 @@ import org.mozgotrash.repository.LogRepository;
 import org.mozgotrash.rest.request.AddBookRequest;
 import org.mozgotrash.rest.response.GoalDto;
 import org.mozgotrash.rest.response.ProgressDto;
-import org.mozgotrash.service.ProgressCalculator;
-import org.mozgotrash.service.ProgressService;
+import org.mozgotrash.service.ProgressServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-import org.yaml.snakeyaml.util.Tuple;
 
 import java.math.BigDecimal;
 import java.util.Base64;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/progress")
 public class ProgressController {
 
     @Autowired
-    private ProgressService progressService;
+    private ProgressServiceImpl progressService;
 
     @Autowired
     private BookRepository bookRepository;
