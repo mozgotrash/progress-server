@@ -52,4 +52,15 @@ public class Book {
     }
 
 
+    @Override
+    public String toString() {
+        return "Book{" +
+                "id=" + id +
+                ", author='" + author + '\'' +
+                ", title='" + title + '\'' +
+                ", pageCount=" + pageCount +
+                ", status=" + status +
+                ", goalId=" + (goal != null ? goal.getId() : null) + // только ID цели
+                '}';
+    }
 }

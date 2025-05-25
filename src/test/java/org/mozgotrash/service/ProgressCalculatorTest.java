@@ -32,7 +32,7 @@ public class ProgressCalculatorTest {
                 .status(Book.Status.IN_PROGRESS)
                 .pageCount(500)
                 .build();
-        var res = progressCalculator.getProgressForBook(book);
+        var res = progressCalculator.getPercentage(null, null);
         Assertions.assertEquals(2d, res);
     }
 
@@ -54,7 +54,7 @@ public class ProgressCalculatorTest {
                 Book.builder().id(3l).status(Book.Status.HOLD).pageCount(100).build(), List.of()
         );
 
-        BigDecimal res = progressCalculator.getProgressForGoal(null);
+        BigDecimal res = progressCalculator.getPercentage(null, null);
         Assertions.assertEquals(50d, res);
     }
 }

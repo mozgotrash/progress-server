@@ -40,4 +40,13 @@ public class Goal {
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     User user;
 
+    @Override
+    public String toString() {
+        return "Goal{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                ", deadline=" + deadline +
+                ", user=" + (user != null ? user.getId() : null) + // избегаем рекурсии через user
+                '}';
+    }
 }

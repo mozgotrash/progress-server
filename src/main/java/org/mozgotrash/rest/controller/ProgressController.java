@@ -9,7 +9,7 @@ import org.mozgotrash.repository.LogRepository;
 import org.mozgotrash.rest.request.AddBookRequest;
 import org.mozgotrash.rest.response.GoalDto;
 import org.mozgotrash.rest.response.ProgressDto;
-import org.mozgotrash.service.ProgressServiceImpl;
+import org.mozgotrash.service.impl.ProgressServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -43,20 +43,17 @@ public class ProgressController {
     @GetMapping("/current")
     ResponseEntity<ProgressDto> getProgress() {
         List<Goal> userGoals = goalRepository.findByUserId(1L);
-        BigDecimal progressPercentage = progressService.getProgressPercentage(userGoals.get(0));
+        BigDecimal goalPercent = progressService.getGoalProgressPercentage(userGoals.get(0));
         GoalDto goalDto = GoalDto.fromEntity(userGoals.get(0));
         goalDto.getBooks()
                 .forEach(bookDto -> {
-                    Double percentRead = (logRepository.findAllByBookId(bookDto.getId())
-                            .stream()
-                            .mapToDouble(Log::getPageCount).sum() / bookDto.getPageCount())
-                            * 100;
+                    BigDecimal percentRead = progressService.getBookProgressPercentage(bookDto.getId());
                     bookDto.setPercentRead(percentRead);
                 });
         return ResponseEntity.ok(ProgressDto
                 .builder()
                 .goal(goalDto)
-                .progressPercentage(progressPercentage)
+                .progressPercentage(goalPercent)
                 .build());
     }
 

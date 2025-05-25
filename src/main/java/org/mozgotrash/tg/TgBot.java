@@ -5,43 +5,42 @@ import org.mozgotrash.constant.TgBotConstant;
 import org.mozgotrash.model.Book;
 import org.mozgotrash.model.User;
 import org.mozgotrash.repository.BookRepository;
+import org.mozgotrash.repository.LogRepository;
 import org.mozgotrash.repository.UserRepository;
-import org.mozgotrash.rest.response.BookDto;
-import org.mozgotrash.service.impl.ProgressService;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.mozgotrash.repository.dto.GoalLogs;
+import org.mozgotrash.service.ProgressService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.mozgotrash.constant.TgBotConstant.CHECK_PROGRESS_BUTTON;
 
 @Component
 public class TgBot extends TelegramLongPollingBot {
     private final ProgressService progressService;
     private final UserRepository userRepository;
     private final BookRepository bookRepository;
+    private final LogRepository logRepository;
     private final UserStateManager userStateManager = new UserStateManager();
 
 
     public TgBot(@Value("${tg.bot.token}") String token,
                  ProgressService progressService,
                  UserRepository userRepository,
-                 BookRepository bookRepository) {
+                 BookRepository bookRepository,
+                 LogRepository logRepository) {
         super(token);
         this.progressService = progressService;
         this.userRepository = userRepository;
         this.bookRepository = bookRepository;
+        this.logRepository = logRepository;
     }
 
     @Override
@@ -95,21 +94,24 @@ public class TgBot extends TelegramLongPollingBot {
                         Book book = bookRepository.findById(2L).get();
                         sendMessage.setText("Для какой книги отметить прогресс?");
                         sendMessage.setReplyMarkup(MarkupFactory.getInlineKeyboardForBooks(List.of(book)));
-
                         userStateManager.setState(userId, BotState.AWAITING_BOOK_ID);
                     } else if (message.equals("Есть прогресс?")) {
                         User user = userRepository.findByTgId(update.getMessage().getFrom().getId());
                         BigDecimal percentage = progressService.getProgressPercentage(user.getId());
-                        sendMessage.setText("Текущий прогресс: " + percentage + "%");
+                        List<GoalLogs> goalLogs = logRepository.getLogsByGoalsForUser(user.getId(), LocalDateTime.now().minusDays(3));
+                        String logInfo = String.format("За последние 3 дня в проекте %s прочитано %d страниц",
+                                goalLogs.get(0).goalTitle(), goalLogs.get(0).pageCount());
+                        sendMessage.setText("Текущий прогресс: " + percentage + "%\n" + logInfo);
                     }
                 }
                 case AWAITING_PAGES -> {
                     if (!message.matches("-?\\d+")) {
                         sendMessage.setText("Введи корректное число");
+                        break;
                     }
-                    progressService.logProgress(userStateManager.getBookId(userId), Integer.parseInt(message));
+                    BigDecimal gainProgress = progressService.logProgress(userStateManager.getBookId(userId), Integer.parseInt(message));
                     userStateManager.setState(userId, BotState.START);
-                    sendMessage.setText("Готово");
+                    sendMessage.setText(String.format("Как с куста +%s%s", gainProgress, "%"));
 
                     if (isAdmin) {
                         sendMessage.setReplyMarkup(MarkupFactory.getReplyKeyboardMarkup(List.of("Прочитал", "Есть прогресс?")));
@@ -117,7 +119,6 @@ public class TgBot extends TelegramLongPollingBot {
                         sendMessage.setReplyMarkup(MarkupFactory.getReplyKeyboardMarkup(List.of("Есть прогресс?")));
                     }
                 }
-
             }
         }
         sendMessage.setChatId(chatId);

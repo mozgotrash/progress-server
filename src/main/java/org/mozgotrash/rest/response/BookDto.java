@@ -5,6 +5,8 @@ import lombok.Data;
 import org.mozgotrash.model.Book;
 import org.mozgotrash.model.Goal;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Base64;
 
 @Data
@@ -20,9 +22,9 @@ public class BookDto {
 
     String base64Image;
 
-    Double percentageOfGoal;
+    BigDecimal percentageOfGoal;
 
-    Double percentRead;
+    BigDecimal percentRead;
 
     Book.Status status;
 
@@ -38,8 +40,9 @@ public class BookDto {
                 .build();
     }
 
-    private static double getPercentageOfGoal(Book book) {
-        int goalPageSum = book.getGoal().getBooks().stream().mapToInt(Book::getPageCount).sum();
-        return ((double) book.getPageCount() / goalPageSum ) * 100;
+    private static BigDecimal getPercentageOfGoal(Book book) {
+        int total = book.getGoal().getBooks().stream().mapToInt(Book::getPageCount).sum();
+        return BigDecimal.valueOf((book.getPageCount() / total) * 100L)
+                .setScale(3, RoundingMode.FLOOR);
     }
 }

@@ -19,6 +19,7 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 
 //TODO временный класс для разработки, удалить после
@@ -52,7 +53,7 @@ public class SqlInitializer implements ApplicationListener<ContextRefreshedEvent
                 .title("Spring в действии, 6-е издание")
                 .author("Крейг Уоллс")
                 .goal(saved)
-                .status(Book.Status.IN_PROGRESS)
+                .status(Book.Status.COMPLETED)
                 .build());
         Book bookWithLogs = bookRepository.save(Book.builder()
                 .pageCount(630)
@@ -74,13 +75,7 @@ public class SqlInitializer implements ApplicationListener<ContextRefreshedEvent
         logRepository.save(Log.builder()
                 .book(bookWithLogs)
                 .pageCount(180)
-                .logDate(OffsetDateTime.now())
-                .build());
-
-        logRepository.save(Log.builder()
-                .book(bookWithLogs2)
-                .pageCount(526)
-                .logDate(OffsetDateTime.now())
+                .logDate(LocalDateTime.now())
                 .build());
     }
 
