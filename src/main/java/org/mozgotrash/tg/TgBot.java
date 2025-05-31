@@ -20,6 +20,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 
 @Component
@@ -75,7 +76,7 @@ public class TgBot extends TelegramLongPollingBot {
             botState = userStateManager.getState(update.getMessage().getFrom().getId());
             chatId = update.getMessage().getChatId();
             Long userId = update.getMessage().getFrom().getId();
-            boolean isAdmin = update.getMessage().getFrom().getUserName().equals(TgBotConstant.ADMIN_USERNAME.getCode());
+            boolean isAdmin = Optional.ofNullable(update.getMessage().getFrom().getUserName()).orElse("").equals(TgBotConstant.ADMIN_USERNAME.getCode());
 
             //попробовать отдельно стейт апдейтить и сообщения
             // State machine ???
@@ -90,13 +91,17 @@ public class TgBot extends TelegramLongPollingBot {
                             sendMessage.setReplyMarkup(MarkupFactory.getReplyKeyboardMarkup(List.of("Есть прогресс?")));
                             sendMessage.setText("Привет, я бот на службе прогресса Кости.");
                         }
-                    } else if (message.equals("Прочитал") && isAdmin) {
+                    } else if (message.equals("Прочитал")) {
+                        if(!isAdmin) {
+                            sendMessage.setText("У вас пока нет права логировать прогресс");
+                            break;
+                        }
                         Book book = bookRepository.findById(2L).get();
                         sendMessage.setText("Для какой книги отметить прогресс?");
                         sendMessage.setReplyMarkup(MarkupFactory.getInlineKeyboardForBooks(List.of(book)));
                         userStateManager.setState(userId, BotState.AWAITING_BOOK_ID);
                     } else if (message.equals("Есть прогресс?")) {
-                        User user = userRepository.findByTgId(update.getMessage().getFrom().getId());
+                        User user = userRepository.findByTgId(637781634L);
                         BigDecimal percentage = progressService.getProgressPercentage(user.getId());
                         List<GoalLogs> goalLogs = logRepository.getLogsByGoalsForUser(user.getId(), LocalDateTime.now().minusDays(3));
                         String logInfo = String.format("За последние 3 дня в проекте %s прочитано %d страниц",

@@ -45,6 +45,7 @@ public class ProgressServiceImpl implements ProgressService {
     }
 
     @Override
+    @Transactional
     public BigDecimal getGoalProgressPercentage(Goal goal) {
         Integer pagesInGoal = goal.getBooks().stream()
                 .mapToInt(Book::getPageCount)
