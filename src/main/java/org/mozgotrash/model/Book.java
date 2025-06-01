@@ -35,8 +35,8 @@ public class Book {
 
     Integer pageCount;
 
-    @Lob
-//    @Column(columnDefinition = "BLOB") //для запуска с h2
+//    @Lob
+    @Column(columnDefinition = "BLOB") //для запуска с h2
     byte[] imageData;
 
     @JsonBackReference
