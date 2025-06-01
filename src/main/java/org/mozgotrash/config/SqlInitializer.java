@@ -64,6 +64,30 @@ public class SqlInitializer implements ApplicationListener<ContextRefreshedEvent
                 .status(Book.Status.IN_PROGRESS)
                 .build());
         bookRepository.save(Book.builder()
+                .pageCount(454)
+                .imageData(getImageBytes("concurrency.png"))
+                .title("Java Concurrency на практике")
+                .author("Гетц Брайан, Пайерлс Тим, Джошуа Блох, Даг Ли, Боубер Джозеф, Холмс Дэвид")
+                .goal(saved)
+                .status(Book.Status.HOLD)
+                .build());
+        bookRepository.save(Book.builder()
+                .pageCount(278)
+                .imageData(getImageBytes("kafka.png"))
+                .title("Apache Kafka. Потоковая обработка и анализ данных")
+                .author("Палино Тодд, Нархид Ния, Шапира Гвен")
+                .goal(saved)
+                .status(Book.Status.HOLD)
+                .build());
+        bookRepository.save(Book.builder()
+                .pageCount(493)
+                .imageData(getImageBytes("spring5-reactive.png"))
+                .title("Практика реактивного программирования в Spring 5")
+                .author("Докука О., Лозинский И.")
+                .goal(saved)
+                .status(Book.Status.HOLD)
+                .build());
+        bookRepository.save(Book.builder()
                 .pageCount(836)
                 .imageData(getImageBytes("algorithms.png"))
                 .title("Алгоритмы на Java, 4-е издание")
@@ -75,7 +99,7 @@ public class SqlInitializer implements ApplicationListener<ContextRefreshedEvent
         logRepository.save(Log.builder()
                 .book(bookWithLogs)
                 .pageCount(180)
-                .logDate(LocalDateTime.now())
+                .logDate(LocalDateTime.now().minusDays(100))
                 .build());
     }
 

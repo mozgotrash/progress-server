@@ -32,7 +32,6 @@ public class Log {
     Book book;
 
     @Column(nullable = false)
-    @CreationTimestamp
     LocalDateTime logDate;
 
 }

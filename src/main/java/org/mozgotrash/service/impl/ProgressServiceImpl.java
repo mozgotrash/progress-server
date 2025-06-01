@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -78,7 +79,7 @@ public class ProgressServiceImpl implements ProgressService {
     @Transactional
     public BigDecimal logProgress(long bookId, int logPage) {
         Book book = bookRepository.findById(bookId).orElseThrow(() -> new RuntimeException("Книга не найдена"));
-        logRepository.save(Log.builder().pageCount(logPage).book(book).build());
+        logRepository.save(Log.builder().pageCount(logPage).book(book).logDate(LocalDateTime.now()).build());
         Integer pagesInGoal = book.getGoal().getBooks().stream()
                 .mapToInt(Book::getPageCount)
                 .sum();

@@ -104,8 +104,13 @@ public class TgBot extends TelegramLongPollingBot {
                         User user = userRepository.findByTgId(637781634L);
                         BigDecimal percentage = progressService.getProgressPercentage(user.getId());
                         List<GoalLogs> goalLogs = logRepository.getLogsByGoalsForUser(user.getId(), LocalDateTime.now().minusDays(3));
-                        String logInfo = String.format("За последние 3 дня в проекте %s прочитано %d страниц",
-                                goalLogs.get(0).goalTitle(), goalLogs.get(0).pageCount());
+                        String logInfo;
+                        if(goalLogs.isEmpty()) {
+                            logInfo = "Прогресса за последние 3 дня нет, я бездельничаю";
+                        } else {
+                            logInfo = String.format("За последние 3 дня в проекте %s прочитано %d страниц",
+                                    goalLogs.get(0).goalTitle(), goalLogs.get(0).pageCount());
+                        }
                         sendMessage.setText("Текущий прогресс: " + percentage + "%\n" + logInfo);
                     }
                 }
